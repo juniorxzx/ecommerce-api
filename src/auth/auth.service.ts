@@ -36,20 +36,37 @@ export class AuthService {
 
   checkToken(token: string) {
     try {
-      const data = this.jwtService.verify(token, {
-        issuer: 'login',
-        audience: 'users',
-      });
+      const data = this.jwtService.verify(token);
+      console.log(data);
       return data;
     } catch (error) {
       throw new UnauthorizedException('token is not valid');
     }
   }
 
-  async register({ email, name, password }: AuthRegisterDTO) {
-    const user = await this.userService.createAccount(email, name, password);
-
-    return this.createToken(user);
+  isValid(token: string) {
+    try {
+      const data = this.jwtService.verify(token);
+      if (data) {
+        return true;
+      }
+    } catch (error) {
+      throw new UnauthorizedException('token is not valid');
+    }
+  }
+  async register({ email, name, dateOfBirth, password }: AuthRegisterDTO) {
+    const formattedDateOfBirth = new Date(dateOfBirth);
+    const user = await this.userService.createAccount(
+      email,
+      name,
+      formattedDateOfBirth,
+      password,
+    );
+    const token = await this.createToken(user);
+    return {
+      token,
+      user: user,
+    };
   }
 
   async login({ email, password }: AuthLoginDTO) {
@@ -69,6 +86,10 @@ export class AuthService {
       throw new UnauthorizedException('Email or password invalid');
     }
 
-    return this.createToken(user);
+    const token = await this.createToken(user);
+    return {
+      token,
+      user: user.id,
+    };
   }
 }

@@ -12,7 +12,12 @@ import { updateDataUserDTO } from './dto/update-partial-data.dto';
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  async createAccount(email: string, name: string, password: string) {
+  async createAccount(
+    email: string,
+    name: string,
+    dateOfBirth: Date,
+    password: string,
+  ) {
     const userWithSameEmail = await this.prisma.user.findUnique({
       where: {
         email,
@@ -31,6 +36,7 @@ export class UserService {
       data: {
         email,
         name,
+        dateOfBirth,
         password: hashPassword,
       },
     });
@@ -52,7 +58,7 @@ export class UserService {
 
   async updateDataUser(
     id: number,
-    { email, name, password, role }: updateDataUserDTO,
+    { email, name, password, role, dateOfBirth }: updateDataUserDTO,
   ) {
     const idExists = await this.checkId(id);
 
@@ -67,6 +73,7 @@ export class UserService {
           email,
           name,
           password,
+          dateOfBirth,
           role,
         },
       });

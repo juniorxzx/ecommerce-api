@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsDateString,
   IsEmail,
   IsEnum,
   IsOptional,
@@ -16,6 +17,9 @@ export class CreateAccountDTO {
   @ApiProperty()
   @IsEmail()
   email: string;
+
+  @IsDateString()
+  dateOfBirth: Date;
 
   @ApiProperty()
   @IsStrongPassword({

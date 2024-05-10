@@ -8,38 +8,46 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String
-  email    String    @unique
-  password String
-  role     Int       @default(1)
-  comments Comment[]
+  id          Int      @id @default(autoincrement())
+  name        String
+  dateOfBirth DateTime
+  image       String?
+  email       String   @unique
+  password    String
+  role        Int      @default(1)
+  cart        Cart[]
 
   @@map("users")
 }
 
-model Comment {
+model Cart {
   id        Int       @id @default(autoincrement())
-  content   String
-  createdAt DateTime  @default(now()) @map("created_at")
+  addedAt   DateTime  @default(now()) @map("added_at")
   updatedAt DateTime? @default(now()) @map("updated_at")
+  userId    Int       @unique @map("user_id")
+  user      User      @relation(fields: [userId], references: [id])
+  products  Int[]     @map("cart_products")
 
-  authorId Int  @map("author_id")
-  author   User @relation(fields: [authorId], references: [id])
-
-  productId Int     @map("product_id")
-  product   Product @relation(fields: [productId], references: [id])
-
-  @@map("comments")
+  @@map("cart")
 }
 
 model Product {
   id          Int       @id @default(autoincrement())
   name        String
-  img         String
+  img         String[]
   description String
+  price       Decimal
   stars       Float?    @default(1)
-  comments    Comment[]
+  categoryId  Int?      @default(autoincrement())
+  category    Category? @relation(fields: [categoryId], references: [id])
 
   @@map("products")
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+
+  @@map("categories")
 }
